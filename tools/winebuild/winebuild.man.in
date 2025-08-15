@@ -133,6 +133,10 @@ Specify a code generation option. Currently \fB\-fPIC\fR and
 \fB\-fasynchronous-unwind-tables\fR are supported. Other options are
 ignored for compatibility with the C compiler.
 .TP
+.B \--disable-dynamicbase
+Disable 'ASLR' address space layout randomization in executable image.
+The default is 'ASLR' enabled.
+.TP
 .B \--fake-module
 Create a fake PE module for a dll or exe, instead of the normal
 assembly or object file. The PE module contains the resources for the

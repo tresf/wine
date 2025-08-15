@@ -182,6 +182,7 @@ static const char usage_str[] =
 "       --data-only           Generate a data-only dll (i.e. without any executable code)\n"
 "   -d, --delay-lib=LIB       Import the specified library in delayed mode\n"
 "   -D SYM                    Ignored for C flags compatibility\n"
+"       --disable-dynamicbase Disable 'ASLR' address space layout randomization (default: ASLR on)\n"
 "   -e, --entry=FUNC          Set the DLL entry point function (default: DllMain)\n"
 "   -E, --export=FILE         Export the symbols defined in the .spec or .def file\n"
 "       --external-symbols    Allow linking to external symbols\n"
@@ -226,6 +227,7 @@ enum long_options_values
 {
     LONG_OPT_DLL = 1,
     LONG_OPT_DEF,
+    LONG_OPT_DISABLE_DYNAMICBASE,
     LONG_OPT_EXE,
     LONG_OPT_IMPLIB,
     LONG_OPT_BUILTIN,
@@ -256,6 +258,7 @@ static const struct long_option long_options[] =
     /* mode options */
     { "dll",                 0, LONG_OPT_DLL },
     { "def",                 0, LONG_OPT_DEF },
+    { "disable-dynamicbase", 0, LONG_OPT_DISABLE_DYNAMICBASE },
     { "exe",                 0, LONG_OPT_EXE },
     { "implib",              0, LONG_OPT_IMPLIB },
     { "staticlib",           0, LONG_OPT_STATICLIB },
@@ -436,6 +439,9 @@ static void option_callback( int optc, char *optarg )
     case LONG_OPT_DEF:
         set_exec_mode( MODE_DEF );
         break;
+    case LONG_OPT_DISABLE_DYNAMICBASE:
+        main_spec->dll_characteristics &= ~IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE;
+        break;
     case LONG_OPT_EXE:
         set_exec_mode( MODE_EXE );
         if (!main_spec->subsystem) main_spec->subsystem = IMAGE_SUBSYSTEM_WINDOWS_GUI;
@@ -598,6 +604,7 @@ int main(int argc, char **argv)
         else
         {
             spec->characteristics |= IMAGE_FILE_LARGE_ADDRESS_AWARE;
+            /* no-op if disable-dynamicbase is set */
             spec->dll_characteristics |= IMAGE_DLLCHARACTERISTICS_HIGH_ENTROPY_VA;
         }
 
